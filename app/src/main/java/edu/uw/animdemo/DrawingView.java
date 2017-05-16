@@ -8,6 +8,10 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * A basic custom view for drawing on.
  * @author Joel Ross
@@ -23,8 +27,11 @@ public class DrawingView extends View {
 
     //drawing values
     private Paint whitePaint; //drawing variables (pre-defined for speed)
+    private Paint goldPaint;
 
     public Ball ball; //public for easy access
+
+    private static Map touches = new HashMap<Integer, Ball>();
 
     /**
      * We need to override all the constructors, since we don't know which will be called
@@ -47,6 +54,8 @@ public class DrawingView extends View {
         whitePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         whitePaint.setColor(Color.WHITE);
 
+        goldPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        goldPaint.setColor(Color.rgb(145, 123, 76));
     }
 
     /**
@@ -97,5 +106,21 @@ public class DrawingView extends View {
         }
         canvas.drawBitmap(bmp, 0, 0, null); //and then draw the BitMap onto the canvas.
         //Canvas bmc = new Canvas(bmp); //we can also make a canvas out of a Bitmap to draw on that (like fetching g2d from a BufferedImage) if we don't want to double-buffer
+
+        Set<Integer> keys = touches.keySet();
+        Ball temp;
+        for (int key : keys) {
+            temp = (Ball) touches.get(key);
+            canvas.drawCircle(temp.cx, temp.cy, ball.radius, goldPaint);
+        }
+    }
+
+    public static synchronized void addTouch(int pId, float x, float y) {
+        Ball temp = new Ball(x, y, 30);
+        touches.put(pId, temp);
+    }
+
+    public static synchronized void removeTouch(int pId) {
+        touches.remove(pId);
     }
 }

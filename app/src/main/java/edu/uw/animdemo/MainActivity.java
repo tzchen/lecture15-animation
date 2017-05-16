@@ -41,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean onTouchEvent(MotionEvent event) {
         //Log.v(TAG, event.toString());
 
+        int pIndex = MotionEventCompat.getActionIndex(event);
+        int pId = MotionEventCompat.getPointerId(event, pIndex);
+
         boolean gesture = mDetector.onTouchEvent(event); //ask the detector to handle instead
         //if(gesture) return true; //if we don't also want to handle
 
@@ -50,7 +53,8 @@ public class MainActivity extends AppCompatActivity {
         int action = MotionEventCompat.getActionMasked(event);
         switch(action) {
             case (MotionEvent.ACTION_DOWN) : //put finger down
-                //Log.v(TAG, "finger down");
+                Log.v(TAG, "finger down");
+                DrawingView.addTouch(pId, event.getX(pId), event.getY(pId));
 
                 ObjectAnimator xAnim = ObjectAnimator.ofFloat(view.ball, "x", x);
                 xAnim.setDuration(1000);
@@ -71,7 +75,18 @@ public class MainActivity extends AppCompatActivity {
 //                view.ball.cx = x;
 //                view.ball.cy = y;
                 return true;
+            case (MotionEvent.ACTION_POINTER_DOWN) :
+                Log.v(TAG, "another finger down");
+                DrawingView.addTouch(pId, event.getX(pId), event.getY(pId));
+                return true;
+            case (MotionEvent.ACTION_POINTER_UP) :
+                Log.v(TAG, "another finger up");
+                DrawingView.removeTouch(pId);
+                return true;
             case (MotionEvent.ACTION_UP) : //lift finger up
+                Log.v(TAG, "last finger up");
+                DrawingView.removeTouch(pId);
+                return true;
             case (MotionEvent.ACTION_CANCEL) : //aborted gesture
             case (MotionEvent.ACTION_OUTSIDE) : //outside bounds
             default :
